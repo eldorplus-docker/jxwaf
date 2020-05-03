@@ -300,18 +300,8 @@ local function _http_body()
 end
 
 local function _remote_addr()
-	local xff = ngx.req.get_headers()['X-Forwarded-For']
 	local result
-	if xff then
-		local ip = ngx.re.match(ngx.var.remote_addr,[=[^\d{1,3}+\.\d{1,3}+\.\d{1,3}+\.\d{1,3}+]=],'oj')
-		if ip then
-			result = ip 
-		else
-			result = ngx.var.remote_addr
-		end 		
-	else
-		result = ngx.var.remote_addr
-	end
+  result = ngx.var.remote_addr
 	ngx.ctx.remote_addr = result
 	return result
 end
@@ -328,7 +318,7 @@ local function _http_full_info()
   full_info['body'] = ngx.ctx.http_body or  _http_body()
   full_info['remote_addr'] = ngx.var.remote_addr
   full_info['xxf_addr'] = ngx.ctx.remote_addr or _remote_addr()
-  ngx.ctx.http_full_info = full_info
+  --ngx.ctx.http_full_info = full_info
   return full_info
 end
 
@@ -371,7 +361,8 @@ _M.request = {
 	REMOTE_ADDR = function() return ngx.ctx.remote_addr or _remote_addr() end, --ip xff
 	REAL_REMOTE_ADDR = function() return ngx.var.remote_addr end,
 	TIME_STAMP = function() return tonumber(ngx.time()) end,
-  HTTP_FULL_INFO = function() return ngx.ctx.http_full_info or _http_full_info() end,
+  --HTTP_FULL_INFO = function() return ngx.ctx.http_full_info or _http_full_info() end,
+  HTTP_FULL_INFO = function() return _http_full_info() end,
   HTTP_UPLOAD_INFO = function() return  _http_upload_info() end,
 }
 
